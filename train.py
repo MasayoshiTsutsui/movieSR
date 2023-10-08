@@ -15,6 +15,9 @@ from torchvision import transforms
 from PIL import Image
 from typing import Tuple
 
+
+
+
 # ハイパーパラメータ
 learning_rate: float = 0.001
 batch_size: int = 32
@@ -30,7 +33,6 @@ preprocess: transforms.Compose = transforms.Compose([
     transforms.ToTensor()
 ])
 
-# カスタムデータセット
 class SuperResolutionDataset(Dataset):
     def __init__(self, data_dir_360p: str, data_dir_720p: str, transform: transforms.Compose) -> None:
         self.data_dir_360p = data_dir_360p
@@ -65,12 +67,13 @@ def train(model: nn.Module, data_loader: DataLoader, criterion: nn.Module, optim
             loss = criterion(outputs, targets)
             loss.backward()
             optimizer.step()
+            print(f'Batch Loss: {loss.item()}')
 
         print(f'Epoch [{epoch + 1}/{num_epochs}] Loss: {loss.item()}')
 
 # データローダーの作成
 dataset = SuperResolutionDataset(data_dir_360p, data_dir_720p, transform=preprocess)
-data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+data_loader = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=os.cpu_count(), pin_memory=True)
 
 model = SRCNN()
 
