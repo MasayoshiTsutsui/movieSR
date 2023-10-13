@@ -1,3 +1,4 @@
 frames_360p/*.png
 frames_720p/*.png
 movie/*.mp4
+model/*pth
